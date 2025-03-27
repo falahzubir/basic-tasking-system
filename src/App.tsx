@@ -43,21 +43,39 @@ export default function TaskManager() {
   // Filter tasks based on selection
   const filteredTasks = tasks.filter((task) => filter === "ALL" || task.status === filter);
 
+  // Function to determine badge color
+  const getBadgeClass = (status: string) => {
+    switch (status) {
+      case "IN PROGRESS":
+        return "badge bg-warning";
+      case "DONE":
+        return "badge bg-success";
+      case "COMPLETE":
+        return "badge bg-primary";
+      default:
+        return "badge bg-secondary";
+    }
+  };
+
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 p-5">
       <h1 className="mb-4">Task Manager</h1>
 
       {/* Task Creation Form */}
       <div className="mb-4">
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Task Name" className="form-control mb-2" />
-        <select value={parentId} onChange={(e) => setParentId(e.target.value === "" ? "" : Number(e.target.value))} className="form-select mb-2">
-          <option value="">No Parent</option>
-          {tasks.map((task) => (
-            <option key={task.id} value={task.id}>
-              {task.name}
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="What the task today?" className="form-control mb-2" />
+        {tasks.length > 0 && (
+          <select value={parentId} onChange={(e) => setParentId(e.target.value === "" ? "" : Number(e.target.value))} className="form-select mb-2">
+            <option selected disabled>
+              Choose your parent task
             </option>
-          ))}
-        </select>
+            {tasks.map((task) => (
+              <option key={task.id} value={task.id}>
+                {task.name}
+              </option>
+            ))}
+          </select>
+        )}
         <button onClick={addTask} className="btn btn-primary">
           Add Task
         </button>
@@ -75,16 +93,36 @@ export default function TaskManager() {
       </div>
 
       {/* Task List */}
-      <ul className="list-group">
-        {filteredTasks.map((task) => (
-          <li key={task.id} className="list-group-item d-flex justify-content-between align-items-center">
-            <span>
-              {task.name} ({task.status})
-            </span>
-            <input type="checkbox" checked={task.status === "DONE"} onChange={() => toggleStatus(task.id)} />
-          </li>
-        ))}
-      </ul>
+      <table className="table table-bordered text-center" style={{ tableLayout: "fixed", width: "100%" }}>
+        <thead>
+          <tr>
+            <th style={{ width: "10%" }}>#</th>
+            <th style={{ width: "50%" }}>Task Name</th>
+            <th style={{ width: "20%" }}>Status</th>
+            <th style={{ width: "20%" }}>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredTasks.length > 0 ? (
+            filteredTasks.map((task, index) => (
+              <tr key={task.id}>
+                <td>{index + 1}</td>
+                <td>{task.name}</td>
+                <td>
+                  <span className={getBadgeClass(task.status)}>{task.status}</span>
+                </td>
+                <td>
+                  <input type="checkbox" checked={task.status === "DONE"} onChange={() => toggleStatus(task.id)} />
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={4}>No data</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
