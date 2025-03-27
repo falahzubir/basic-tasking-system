@@ -29,18 +29,19 @@ function App() {
   // Function to toggle task status
   const toggleStatus = (id: number) => {
     setTasks((prevTasks) => {
+      // Toggle status of the selected task
       const updatedTasks: Task[] = prevTasks.map((task) => (task.id === id ? { ...task, status: task.status === "DONE" ? "IN PROGRESS" : "DONE" } : task));
 
-      // Auto-update parent task to "COMPLETE" if all children are done
-      return updatedTasks.map((task): Task => {
-        if (task.status === "DONE") {
+      // Ensure the parent task updates to "COMPLETE" if all children are "DONE"
+      return updatedTasks.map((task) => {
+        if (!task.parentId) {
           const childTasks = updatedTasks.filter((t) => t.parentId === task.id);
-          if (childTasks.length > 0 && childTasks.every((t) => t.status === "COMPLETE")) {
+          if (childTasks.length > 0 && childTasks.every((t) => t.status === "DONE")) {
             return { ...task, status: "COMPLETE" };
           }
         }
         return task;
-      });
+      }) as Task[]; // Ensure we are returning a Task[]
     });
   };
 

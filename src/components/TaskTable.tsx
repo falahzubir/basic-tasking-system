@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import React from "react";
 import TaskRow from "./TaskRow";
 
 interface TaskTableProps {
@@ -7,17 +7,6 @@ interface TaskTableProps {
 }
 
 const TaskTable: React.FC<TaskTableProps> = ({ tasks, onToggleStatus }) => {
-  const getNestedTasks = (parentId?: number, level = 0): JSX.Element[] => {
-    return tasks
-      .filter((task) => task.parentId === parentId)
-      .map((task) => (
-        <React.Fragment key={task.id}>
-          <TaskRow task={task} level={level} onToggleStatus={onToggleStatus} />
-          {getNestedTasks(task.id, level + 1)}
-        </React.Fragment>
-      ));
-  };
-
   return (
     <table className="table table-bordered text-center" style={{ tableLayout: "fixed", width: "100%" }}>
       <thead>
@@ -30,7 +19,12 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onToggleStatus }) => {
       </thead>
       <tbody>
         {tasks.length > 0 ? (
-          getNestedTasks()
+          tasks
+            .filter((task) => !task.parentId) // Get only parent tasks
+            .map((task) => {
+              const childTasks = tasks.filter((t) => t.parentId === task.id);
+              return <TaskRow key={task.id} task={task} onToggleStatus={onToggleStatus} childTasks={childTasks} />;
+            })
         ) : (
           <tr>
             <td colSpan={4}>No data</td>
