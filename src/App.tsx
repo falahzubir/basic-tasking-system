@@ -11,7 +11,7 @@ interface Task {
   parentId?: number;
 }
 
-export default function TaskManager() {
+function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("ALL");
 
@@ -56,3 +56,5 @@ export default function TaskManager() {
     </div>
   );
 }
+
+export default App;
